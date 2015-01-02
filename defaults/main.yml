@@ -1,0 +1,7 @@
+---
+
+## list of upstart services that should be disabled.
+#
+# Each item is the name of a service found in /etc/init
+#
+upstart_services_disabled: []
