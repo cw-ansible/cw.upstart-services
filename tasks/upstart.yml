@@ -1,0 +1,37 @@
+---
+
+- name: diverting files
+  command:
+    dpkg-divert --local --rename --add '{{ item }}'
+    creates='{{ item }}.distrib'
+  with_items:
+    - /sbin/initctl
+    - /usr/sbin/invoke-rc.d
+    - /usr/sbin/service
+
+- name: add policy files
+  copy:
+    dest='/{{ item }}'
+    src='{{ item }}'
+    mode=0755
+    owner=root
+    group=root
+  with_items:
+    - sbin/initctl-custom
+
+- name: link initclt
+  file:
+    src=/sbin/initctl-custom
+    dest='{{ item }}'
+    state=link
+  with_items:
+    - /usr/sbin/invoke-rc.d
+    - /usr/sbin/service
+    - /sbin/initctl
+
+- name: disable upstart services
+  copy:
+    src=etc/init/manual
+    dest='/etc/init/{{ item }}.override'
+  with_items:
+    upstart_services_disabled
